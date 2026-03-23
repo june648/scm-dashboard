@@ -122,28 +122,22 @@ export default function Dashboard() {
       {/* Header */}
       <header
         className="text-white"
-        style={{ background: "var(--primary)", padding: "16px 28px" }}
+        style={{ background: "var(--primary)", padding: "12px 28px" }}
       >
-        <div className="mx-auto flex max-w-[1200px] items-center gap-3">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="h-7 w-7"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
-            />
-          </svg>
+        <div className="mx-auto flex max-w-[1200px] items-center gap-4">
+          <img
+            src="/logo.jpg"
+            alt="Seattle Cell Market"
+            className="h-10 rounded"
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
+          <div className="h-8 w-px bg-white/30"></div>
           <div>
             <h1 className="text-lg font-bold leading-tight">
-              SCM Team Dashboard
+              Team Dashboard
             </h1>
             <p className="text-[12px] opacity-80">
-              Seattle Cell Market — Internal Tools
+              Internal Tools
             </p>
           </div>
         </div>
