@@ -277,9 +277,9 @@ export default function Dashboard() {
       >
         <div className="mx-auto flex max-w-[1200px] items-center gap-4">
           <img
-            src="/logo.jpg"
+            src="/logo.png"
             alt="Seattle Cell Market"
-            className="h-10 rounded"
+            className="h-9"
             style={{ filter: "brightness(0) invert(1)" }}
           />
           <div className="h-8 w-px bg-white/30"></div>
