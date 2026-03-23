@@ -1,23 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-card: #1e293b;
-  --bg-card-hover: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --accent-blue: #3b82f6;
-  --accent-green: #10b981;
-  --accent-purple: #8b5cf6;
-  --accent-orange: #f59e0b;
-  --accent-pink: #ec4899;
-  --accent-teal: #14b8a6;
-  --border-color: #334155;
+  --background: #f5f6fa;
+  --foreground: #222222;
+  --primary: #3a5bc7;
+  --primary-light: #edf2ff;
+  --primary-hover: #2d4aa8;
+  --success: #27ae60;
+  --success-light: #eafaf1;
+  --warning: #e6a817;
+  --warning-light: #fff8e1;
+  --danger: #ff4d4f;
+  --danger-light: #fff0f0;
+  --purple: #7d3c98;
+  --purple-light: #f4ecf7;
+  --blue: #2e86c1;
+  --blue-light: #d6eaf8;
+  --orange: #e67e22;
+  --orange-light: #fff3e0;
+  --gray-50: #f8f9fb;
+  --gray-100: #f0f1f5;
+  --gray-200: #e2e4ea;
+  --gray-300: #cfd2da;
+  --gray-400: #9ca0ab;
+  --gray-500: #6b7080;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 3px;
 }
