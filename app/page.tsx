@@ -1,97 +1,152 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, ReactNode } from "react";
 
 const PAYROLL_PIN = "5201";
 
-const apps = [
+type AppStatus = "live" | "local" | "restricted" | "coming-soon";
+
+interface AppCard {
+  name: string;
+  description: string;
+  url: string | null;
+  icon: ReactNode;
+  accentColor: string;
+  accentBg: string;
+  status: AppStatus;
+}
+
+interface Section {
+  title: string;
+  icon: ReactNode;
+  apps: AppCard[];
+}
+
+const sections: Section[] = [
   {
-    name: "Payroll",
-    description:
-      "Master Time Sheet Pay — Track hours, compute pay, and manage team payroll.",
-    url: "https://master-time-sheet-pay-client-june648s-projects.vercel.app",
+    title: "Finance & Admin",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
       </svg>
     ),
-    accentColor: "var(--success)",
-    accentBg: "var(--success-light)",
-    status: "restricted" as const,
+    apps: [
+      {
+        name: "Payroll",
+        description: "Track hours, compute pay, and manage team payroll.",
+        url: "https://master-time-sheet-pay-client-june648s-projects.vercel.app",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+        accentColor: "var(--success)",
+        accentBg: "var(--success-light)",
+        status: "restricted",
+      },
+      {
+        name: "Purchase Orders",
+        description: "Finance and purchasing data. Runs locally on Mitch's machine.",
+        url: null,
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+          </svg>
+        ),
+        accentColor: "var(--purple)",
+        accentBg: "var(--purple-light)",
+        status: "local",
+      },
+      {
+        name: "PNL",
+        description: "Profit & Loss reports and financial analytics.",
+        url: null,
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+          </svg>
+        ),
+        accentColor: "var(--blue)",
+        accentBg: "var(--blue-light)",
+        status: "coming-soon",
+      },
+    ],
   },
   {
-    name: "Logistics",
-    description:
-      "SCM Shipment Tracker — Track shipments, manage plans, payments, and archive.",
-    url: "https://scm-shipment-tracker.vercel.app",
+    title: "Operations",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
       </svg>
     ),
-    accentColor: "var(--blue)",
-    accentBg: "var(--blue-light)",
-    status: "live" as const,
+    apps: [
+      {
+        name: "Inventory",
+        description: "Manage product re-order requests from Airtable.",
+        url: "https://reorder-request-app.vercel.app",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+          </svg>
+        ),
+        accentColor: "var(--warning)",
+        accentBg: "var(--warning-light)",
+        status: "live",
+      },
+      {
+        name: "Logistics",
+        description: "Track shipments, manage plans, payments, and archive.",
+        url: "https://scm-shipment-tracker.vercel.app",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+          </svg>
+        ),
+        accentColor: "var(--blue)",
+        accentBg: "var(--blue-light)",
+        status: "live",
+      },
+      {
+        name: "Ad Reports",
+        description: "Amazon advertising performance reports and analytics.",
+        url: null,
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+          </svg>
+        ),
+        accentColor: "var(--orange)",
+        accentBg: "var(--orange-light)",
+        status: "local",
+      },
+    ],
   },
   {
-    name: "Purchase Orders",
-    description:
-      "PO Tracker — Finance and purchasing data. Runs locally on Mitch's machine.",
-    url: null,
+    title: "Team",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
       </svg>
     ),
-    accentColor: "var(--purple)",
-    accentBg: "var(--purple-light)",
-    status: "local" as const,
-  },
-  {
-    name: "Ad Reports",
-    description:
-      "PPC Report — Amazon advertising performance reports and analytics.",
-    url: null,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-      </svg>
-    ),
-    accentColor: "var(--orange)",
-    accentBg: "var(--orange-light)",
-    status: "local" as const,
-  },
-  {
-    name: "Inventory",
-    description:
-      "Re-order Request — Manage product re-order requests from Airtable.",
-    url: "https://reorder-request-app.vercel.app",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-      </svg>
-    ),
-    accentColor: "var(--warning)",
-    accentBg: "var(--warning-light)",
-    status: "live" as const,
-  },
-  {
-    name: "Leave Request",
-    description:
-      "Submit your leave application — vacation, sick leave, or time off requests.",
-    url: "https://airtable.com/app3dNHI3leMmVU0P/pagCRjX0hwsdAUpSU/form",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-      </svg>
-    ),
-    accentColor: "var(--primary)",
-    accentBg: "var(--primary-light)",
-    status: "live" as const,
+    apps: [
+      {
+        name: "Leave Request",
+        description: "Submit your leave application — vacation, sick leave, or time off.",
+        url: "https://airtable.com/app3dNHI3leMmVU0P/pagCRjX0hwsdAUpSU/form",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          </svg>
+        ),
+        accentColor: "var(--primary)",
+        accentBg: "var(--primary-light)",
+        status: "live",
+      },
+    ],
   },
 ];
 
-function StatusBadge({ status }: { status: "live" | "local" | "restricted" }) {
+function StatusBadge({ status }: { status: AppStatus }) {
   if (status === "live") {
     return (
       <span
@@ -113,6 +168,16 @@ function StatusBadge({ status }: { status: "live" | "local" | "restricted" }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
         </svg>
         Restricted
+      </span>
+    );
+  }
+  if (status === "coming-soon") {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+        style={{ background: "var(--primary-light)", color: "var(--primary)" }}
+      >
+        Coming Soon
       </span>
     );
   }
@@ -245,6 +310,111 @@ function PinModal({
   );
 }
 
+function AppCardComponent({
+  app,
+  onPayrollClick,
+}: {
+  app: AppCard;
+  onPayrollClick: (e: React.MouseEvent) => void;
+}) {
+  const isRestricted = app.status === "restricted";
+  const isLocal = app.status === "local";
+  const isComingSoon = app.status === "coming-soon";
+  const isClickable = app.url !== null && !isComingSoon;
+  const isDisabled = isLocal || isComingSoon;
+
+  const handleClick = isRestricted ? onPayrollClick : undefined;
+
+  const Tag = isClickable && !isRestricted ? "a" : "div";
+  const tagProps =
+    isClickable && !isRestricted
+      ? { href: app.url!, target: "_blank", rel: "noopener noreferrer" }
+      : {};
+
+  return (
+    <Tag
+      {...tagProps}
+      onClick={handleClick}
+      className={`group block rounded-[var(--radius-lg)] border bg-white p-5 transition-all duration-150 ${
+        isClickable
+          ? "cursor-pointer hover:-translate-y-0.5"
+          : isDisabled
+            ? "opacity-50"
+            : ""
+      }`}
+      style={{
+        borderColor: "var(--gray-200)",
+        boxShadow: "var(--shadow-sm)",
+      }}
+      onMouseEnter={
+        isClickable
+          ? (e) => {
+              (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-md)";
+              (e.currentTarget as HTMLElement).style.borderColor = app.accentColor;
+            }
+          : undefined
+      }
+      onMouseLeave={
+        isClickable
+          ? (e) => {
+              (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-sm)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--gray-200)";
+            }
+          : undefined
+      }
+    >
+      <div className="flex items-start justify-between">
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)]"
+          style={{ background: app.accentBg, color: app.accentColor }}
+        >
+          {app.icon}
+        </div>
+        <StatusBadge status={app.status} />
+      </div>
+
+      <div className="mt-3.5">
+        <h2 className="text-[15px] font-semibold" style={{ color: "var(--foreground)" }}>
+          {app.name}
+        </h2>
+        <p className="mt-1 text-[13px] leading-relaxed" style={{ color: "var(--gray-500)" }}>
+          {app.description}
+        </p>
+      </div>
+
+      {isClickable && !isRestricted && (
+        <div
+          className="mt-3.5 flex items-center gap-1.5 text-[13px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+          style={{ color: app.accentColor }}
+        >
+          Open App
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </div>
+      )}
+
+      {isRestricted && (
+        <div
+          className="mt-3.5 flex items-center gap-1.5 text-[13px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+          style={{ color: app.accentColor }}
+        >
+          Unlock & Open
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="h-3.5 w-3.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+        </div>
+      )}
+
+      {isLocal && (
+        <div className="mt-3.5 text-[12px]" style={{ color: "var(--gray-400)" }}>
+          Available on local machine only
+        </div>
+      )}
+    </Tag>
+  );
+}
+
 export default function Dashboard() {
   const [showPinModal, setShowPinModal] = useState(false);
 
@@ -284,133 +454,35 @@ export default function Dashboard() {
           />
           <div className="h-8 w-px bg-white/30"></div>
           <div>
-            <h1 className="text-lg font-bold leading-tight">
-              Team Dashboard
-            </h1>
-            <p className="text-[12px] opacity-80">
-              Internal Tools
-            </p>
+            <h1 className="text-lg font-bold leading-tight">Team Dashboard</h1>
+            <p className="text-[12px] opacity-80">Internal Tools</p>
           </div>
         </div>
       </header>
 
-      {/* Main Grid */}
+      {/* Sections */}
       <main className="mx-auto max-w-[1200px] px-6 py-8">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {apps.map((app) => {
-            const isRestricted = app.status === "restricted";
-            const isClickable = app.url !== null;
-            const isLocal = app.status === "local";
-
-            const handleClick = isRestricted
-              ? handlePayrollClick
-              : undefined;
-
-            const Tag = isClickable ? "a" : "div";
-            const tagProps = isClickable && !isRestricted
-              ? { href: app.url!, target: "_blank", rel: "noopener noreferrer" }
-              : {};
-
-            return (
-              <Tag
-                key={app.name}
-                {...tagProps}
-                onClick={handleClick}
-                className={`group block rounded-[var(--radius-lg)] border bg-white p-5 transition-all duration-150 ${
-                  isClickable
-                    ? "cursor-pointer hover:-translate-y-0.5"
-                    : isLocal
-                      ? "opacity-60"
-                      : ""
-                }`}
-                style={{
-                  borderColor: "var(--gray-200)",
-                  boxShadow: "var(--shadow-sm)",
-                }}
-                onMouseEnter={
-                  isClickable
-                    ? (e) => {
-                        (e.currentTarget as HTMLElement).style.boxShadow =
-                          "var(--shadow-md)";
-                        (e.currentTarget as HTMLElement).style.borderColor =
-                          app.accentColor;
-                      }
-                    : undefined
-                }
-                onMouseLeave={
-                  isClickable
-                    ? (e) => {
-                        (e.currentTarget as HTMLElement).style.boxShadow =
-                          "var(--shadow-sm)";
-                        (e.currentTarget as HTMLElement).style.borderColor =
-                          "var(--gray-200)";
-                      }
-                    : undefined
-                }
+        <div className="space-y-8">
+          {sections.map((section) => (
+            <section key={section.title}>
+              <div
+                className="mb-4 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider"
+                style={{ color: "var(--gray-400)" }}
               >
-                <div className="flex items-start justify-between">
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)]"
-                    style={{
-                      background: app.accentBg,
-                      color: app.accentColor,
-                    }}
-                  >
-                    {app.icon}
-                  </div>
-                  <StatusBadge status={app.status} />
-                </div>
-
-                <div className="mt-3.5">
-                  <h2
-                    className="text-[15px] font-semibold"
-                    style={{ color: "var(--foreground)" }}
-                  >
-                    {app.name}
-                  </h2>
-                  <p
-                    className="mt-1 text-[13px] leading-relaxed"
-                    style={{ color: "var(--gray-500)" }}
-                  >
-                    {app.description}
-                  </p>
-                </div>
-
-                {isClickable && !isRestricted && (
-                  <div
-                    className="mt-3.5 flex items-center gap-1.5 text-[13px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{ color: app.accentColor }}
-                  >
-                    Open App
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </div>
-                )}
-
-                {isRestricted && (
-                  <div
-                    className="mt-3.5 flex items-center gap-1.5 text-[13px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{ color: app.accentColor }}
-                  >
-                    Unlock & Open
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="h-3.5 w-3.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                  </div>
-                )}
-
-                {isLocal && (
-                  <div
-                    className="mt-3.5 text-[12px]"
-                    style={{ color: "var(--gray-400)" }}
-                  >
-                    Available on local machine only
-                  </div>
-                )}
-              </Tag>
-            );
-          })}
+                {section.icon}
+                {section.title}
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {section.apps.map((app) => (
+                  <AppCardComponent
+                    key={app.name}
+                    app={app}
+                    onPayrollClick={handlePayrollClick}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       </main>
 
