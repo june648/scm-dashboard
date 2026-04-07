@@ -36,7 +36,7 @@ const sections: Section[] = [
         description: "Track hours, compute pay, and manage team payroll.",
         url: "https://master-time-sheet-pay-client-june648s-projects.vercel.app",
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
@@ -49,7 +49,7 @@ const sections: Section[] = [
         description: "Finance and purchasing data. Runs locally on Mitch's machine.",
         url: null,
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
           </svg>
         ),
@@ -62,7 +62,7 @@ const sections: Section[] = [
         description: "Profit & Loss reports and financial analytics.",
         url: "https://scm-pnl.vercel.app",
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
           </svg>
         ),
@@ -85,7 +85,7 @@ const sections: Section[] = [
         description: "Manage product re-order requests from Airtable.",
         url: "https://reorder-request-app.vercel.app",
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
           </svg>
         ),
@@ -98,7 +98,7 @@ const sections: Section[] = [
         description: "Track shipments, manage plans, payments, and archive.",
         url: "https://scm-shipment-tracker.vercel.app",
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
           </svg>
         ),
@@ -111,7 +111,7 @@ const sections: Section[] = [
         description: "Create and track inventory transfers between locations.",
         url: "https://transfer-request-app-three.vercel.app",
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
           </svg>
         ),
@@ -124,7 +124,7 @@ const sections: Section[] = [
         description: "View stock levels, inbound shipments, and warehouse inventory.",
         url: null,
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
           </svg>
         ),
@@ -137,7 +137,7 @@ const sections: Section[] = [
         description: "Amazon advertising performance reports and analytics.",
         url: null,
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
           </svg>
         ),
@@ -160,7 +160,7 @@ const sections: Section[] = [
         description: "Submit your leave application — vacation, sick leave, or time off.",
         url: "https://airtable.com/app3dNHI3leMmVU0P/pagCRjX0hwsdAUpSU/form",
         icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
           </svg>
         ),
@@ -361,7 +361,7 @@ function AppCardComponent({
     <Tag
       {...tagProps}
       onClick={handleClick}
-      className={`group block rounded-[var(--radius-lg)] border bg-white p-5 transition-all duration-150 ${
+      className={`group block rounded-[var(--radius-lg)] border bg-white px-4 py-3.5 transition-all duration-150 ${
         isClickable
           ? "cursor-pointer hover:-translate-y-0.5"
           : isDisabled
@@ -391,7 +391,7 @@ function AppCardComponent({
     >
       <div className="flex items-start justify-between">
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)]"
+          className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]"
           style={{ background: app.accentBg, color: app.accentColor }}
         >
           {app.icon}
@@ -399,18 +399,18 @@ function AppCardComponent({
         <StatusBadge status={app.status} />
       </div>
 
-      <div className="mt-3.5">
-        <h2 className="text-[15px] font-semibold" style={{ color: "var(--foreground)" }}>
+      <div className="mt-2.5">
+        <h2 className="text-[14px] font-semibold" style={{ color: "var(--foreground)" }}>
           {app.name}
         </h2>
-        <p className="mt-1 text-[13px] leading-relaxed" style={{ color: "var(--gray-500)" }}>
+        <p className="mt-0.5 text-[12px] leading-relaxed" style={{ color: "var(--gray-500)" }}>
           {app.description}
         </p>
       </div>
 
       {isClickable && !isRestricted && (
         <div
-          className="mt-3.5 flex items-center gap-1.5 text-[13px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+          className="mt-2.5 flex items-center gap-1.5 text-[12px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
           style={{ color: app.accentColor }}
         >
           Open App
@@ -422,7 +422,7 @@ function AppCardComponent({
 
       {isRestricted && (
         <div
-          className="mt-3.5 flex items-center gap-1.5 text-[13px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+          className="mt-2.5 flex items-center gap-1.5 text-[12px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
           style={{ color: app.accentColor }}
         >
           Unlock & Open
@@ -433,7 +433,7 @@ function AppCardComponent({
       )}
 
       {isLocal && (
-        <div className="mt-3.5 text-[12px]" style={{ color: "var(--gray-400)" }}>
+        <div className="mt-2.5 text-[12px]" style={{ color: "var(--gray-400)" }}>
           Available on local machine only
         </div>
       )}
