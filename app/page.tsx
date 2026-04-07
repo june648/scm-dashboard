@@ -107,6 +107,19 @@ const sections: Section[] = [
         status: "live",
       },
       {
+        name: "Transfer Requests",
+        description: "Create and track inventory transfers between locations.",
+        url: "https://transfer-request-app-three.vercel.app",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+          </svg>
+        ),
+        accentColor: "var(--success)",
+        accentBg: "var(--success-light)",
+        status: "live",
+      },
+      {
         name: "Inventory Overview",
         description: "View stock levels, inbound shipments, and warehouse inventory.",
         url: null,
