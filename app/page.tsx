@@ -143,7 +143,7 @@ const sections: Section[] = [
       {
         name: "Inventory KPI",
         description: "Inventory metrics dashboard: revenue, GMROI, turnover, sell-through, days of supply.",
-        url: null,
+        url: "https://inventory-kpi.vercel.app",
         icon: (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.281m5.94 2.28l-2.28 5.941" />
@@ -151,7 +151,7 @@ const sections: Section[] = [
         ),
         accentColor: "var(--primary)",
         accentBg: "var(--primary-light)",
-        status: "coming-soon",
+        status: "live",
       },
     ],
   },
