@@ -42,6 +42,19 @@ const sections: Section[] = [
         accentBg: "var(--purple-light)",
         status: "local",
       },
+      {
+        name: "Virtual Bundles",
+        description: "Calculate bundle pricing, COGS, and margin tiers from Amazon ASINs.",
+        url: "https://virtual-bundles.vercel.app",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+          </svg>
+        ),
+        accentColor: "var(--orange)",
+        accentBg: "var(--orange-light)",
+        status: "live",
+      },
     ],
   },
   {
