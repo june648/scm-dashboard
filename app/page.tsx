@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 
-type AppStatus = "live" | "local" | "coming-soon";
+type AppStatus = "live" | "local" | "coming-soon" | "download";
 
 interface AppCard {
   name: string;
@@ -12,6 +12,7 @@ interface AppCard {
   accentColor: string;
   accentBg: string;
   status: AppStatus;
+  fileSize?: string;
 }
 
 interface Section {
@@ -178,6 +179,58 @@ const sections: Section[] = [
       },
     ],
   },
+  {
+    title: "Downloads",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+      </svg>
+    ),
+    apps: [
+      {
+        name: "JustJamz Catalog — Full",
+        description: "All JustJamz products: USB-C earbuds, 3.5mm earbuds, and cable organization.",
+        url: "/downloads/JustJamz-Catalog-FULL.pdf",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+        ),
+        accentColor: "var(--primary)",
+        accentBg: "var(--primary-light)",
+        status: "download",
+        fileSize: "3.0 MB",
+      },
+      {
+        name: "JustJamz Catalog — USB-C",
+        description: "USB-C earbuds edition.",
+        url: "/downloads/JustJamz-Catalog-USB-C.pdf",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+        ),
+        accentColor: "var(--blue)",
+        accentBg: "var(--blue-light)",
+        status: "download",
+        fileSize: "1.5 MB",
+      },
+      {
+        name: "JustJamz Catalog — 3.5mm + Organization",
+        description: "3.5mm earbuds and cable organization edition.",
+        url: "/downloads/JustJamz-Catalog-3-5mm-Organization.pdf",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+        ),
+        accentColor: "var(--success)",
+        accentBg: "var(--success-light)",
+        status: "download",
+        fileSize: "1.7 MB",
+      },
+    ],
+  },
 ];
 
 function StatusBadge({ status }: { status: AppStatus }) {
@@ -202,6 +255,16 @@ function StatusBadge({ status }: { status: AppStatus }) {
       </span>
     );
   }
+  if (status === "download") {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+        style={{ background: "var(--blue-light)", color: "var(--blue)" }}
+      >
+        PDF
+      </span>
+    );
+  }
   return (
     <span
       className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
@@ -220,14 +283,16 @@ function AppCardComponent({
 }) {
   const isLocal = app.status === "local";
   const isComingSoon = app.status === "coming-soon";
+  const isDownload = app.status === "download";
   const isClickable = app.url !== null && !isComingSoon;
   const isDisabled = isLocal || isComingSoon;
 
   const Tag = isClickable ? "a" : "div";
-  const tagProps =
-    isClickable
-      ? { href: app.url!, target: "_blank", rel: "noopener noreferrer" }
-      : {};
+  const tagProps = isClickable
+    ? isDownload
+      ? { href: app.url!, download: "" }
+      : { href: app.url!, target: "_blank", rel: "noopener noreferrer" }
+    : {};
 
   return (
     <Tag
@@ -279,7 +344,7 @@ function AppCardComponent({
         </p>
       </div>
 
-      {isClickable && (
+      {isClickable && !isDownload && (
         <div
           className="mt-2.5 flex items-center gap-1.5 text-[12px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
           style={{ color: app.accentColor }}
@@ -288,6 +353,21 @@ function AppCardComponent({
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
+        </div>
+      )}
+
+      {isDownload && (
+        <div className="mt-2.5 flex items-center justify-between text-[12px] font-medium">
+          <span style={{ color: "var(--gray-400)" }}>{app.fileSize}</span>
+          <span
+            className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100"
+            style={{ color: app.accentColor }}
+          >
+            Download
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </span>
         </div>
       )}
 
