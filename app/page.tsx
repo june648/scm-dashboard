@@ -188,46 +188,18 @@ const sections: Section[] = [
     ),
     apps: [
       {
-        name: "JustJamz Catalog — Full",
-        description: "All JustJamz products: USB-C earbuds, 3.5mm earbuds, and cable organization.",
-        url: "/downloads/JustJamz-Catalog-FULL.pdf",
+        name: "JustJamz Catalog",
+        description: "Wholesale product catalog. Three editions: Full, USB-C, and 3.5mm + Organization.",
+        url: "/justjamz-catalog",
         icon: (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
           </svg>
         ),
         accentColor: "var(--primary)",
         accentBg: "var(--primary-light)",
         status: "download",
-        fileSize: "3.0 MB",
-      },
-      {
-        name: "JustJamz Catalog — USB-C",
-        description: "USB-C earbuds edition.",
-        url: "/downloads/JustJamz-Catalog-USB-C.pdf",
-        icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-          </svg>
-        ),
-        accentColor: "var(--blue)",
-        accentBg: "var(--blue-light)",
-        status: "download",
-        fileSize: "1.5 MB",
-      },
-      {
-        name: "JustJamz Catalog — 3.5mm + Organization",
-        description: "3.5mm earbuds and cable organization edition.",
-        url: "/downloads/JustJamz-Catalog-3-5mm-Organization.pdf",
-        icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-          </svg>
-        ),
-        accentColor: "var(--success)",
-        accentBg: "var(--success-light)",
-        status: "download",
-        fileSize: "1.7 MB",
+        fileSize: "3 PDFs",
       },
     ],
   },
@@ -286,12 +258,16 @@ function AppCardComponent({
   const isDownload = app.status === "download";
   const isClickable = app.url !== null && !isComingSoon;
   const isDisabled = isLocal || isComingSoon;
+  const isDirectFile = isDownload && !!app.url?.toLowerCase().endsWith(".pdf");
+  const isInternalRoute = !!app.url?.startsWith("/") && !isDirectFile;
 
   const Tag = isClickable ? "a" : "div";
   const tagProps = isClickable
-    ? isDownload
+    ? isDirectFile
       ? { href: app.url!, download: "" }
-      : { href: app.url!, target: "_blank", rel: "noopener noreferrer" }
+      : isInternalRoute
+        ? { href: app.url! }
+        : { href: app.url!, target: "_blank", rel: "noopener noreferrer" }
     : {};
 
   return (
@@ -363,10 +339,16 @@ function AppCardComponent({
             className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100"
             style={{ color: app.accentColor }}
           >
-            Download
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
+            {isDirectFile ? "Download" : "View"}
+            {isDirectFile ? (
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+            ) : (
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            )}
           </span>
         </div>
       )}
