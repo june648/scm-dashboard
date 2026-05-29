@@ -77,6 +77,7 @@ function formatDate(iso: string): string {
 
 export default function PoUpdatesPage() {
   const [pos, setPos] = useState<PoRecord[]>([]);
+  const [statusOptions, setStatusOptions] = useState<string[]>(STATUS_OPTIONS);
   const [configured, setConfigured] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -93,6 +94,9 @@ export default function PoUpdatesPage() {
       const data = await res.json();
       setConfigured(data.configured !== false);
       setPos(data.pos || []);
+      if (Array.isArray(data.statusOptions) && data.statusOptions.length > 0) {
+        setStatusOptions(data.statusOptions);
+      }
       if (data.error) setError(data.error);
     } catch (e) {
       setError((e as Error).message);
@@ -179,6 +183,7 @@ export default function PoUpdatesPage() {
 
         {showNewPo && configured && (
           <NewPoForm
+            options={statusOptions}
             onClose={() => setShowNewPo(false)}
             onSaved={() => {
               setShowNewPo(false);
@@ -433,10 +438,18 @@ function AddUpdateForm({ poId, onSaved }: { poId: string; onSaved: () => void })
   );
 }
 
-function NewPoForm({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+function NewPoForm({
+  options,
+  onClose,
+  onSaved,
+}: {
+  options: string[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
   const [poNumber, setPoNumber] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState(STATUS_OPTIONS[0]);
+  const [status, setStatus] = useState(options[0] || STATUS_OPTIONS[0]);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -490,7 +503,7 @@ function NewPoForm({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
         </Field>
         <Field label="Status">
           <select value={status} onChange={(e) => setStatus(e.target.value)} style={inputStyle}>
-            {STATUS_OPTIONS.map((o) => (
+            {options.map((o) => (
               <option key={o} value={o}>
                 {o}
               </option>

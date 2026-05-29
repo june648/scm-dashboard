@@ -46,6 +46,38 @@ async function fetchAll(table: string) {
   return records;
 }
 
+interface AirtableChoice {
+  name: string;
+}
+interface AirtableField {
+  name: string;
+  options?: { choices?: AirtableChoice[] };
+}
+interface AirtableTable {
+  id: string;
+  name: string;
+  fields?: AirtableField[];
+}
+
+// Read the Status single-select options straight from Airtable's schema,
+// so statuses added/renamed in Airtable show up on the board automatically.
+async function fetchStatusOptions(): Promise<string[]> {
+  try {
+    const res = await fetch(`${AIRTABLE_API}/meta/bases/${BASE_ID}/tables`, {
+      headers: authHeaders(),
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const tables: AirtableTable[] = data.tables || [];
+    const table = tables.find((t) => t.name === POS_TABLE || t.id === POS_TABLE);
+    const field = table?.fields?.find((f) => f.name === "Status");
+    return (field?.options?.choices || []).map((c) => c.name);
+  } catch {
+    return [];
+  }
+}
+
 export interface PoUpdate {
   id: string;
   itemName: string;
@@ -69,9 +101,10 @@ export async function GET() {
   }
 
   try {
-    const [posRaw, updatesRaw] = await Promise.all([
+    const [posRaw, updatesRaw, statusOptions] = await Promise.all([
       fetchAll(POS_TABLE),
       fetchAll(UPDATES_TABLE),
+      fetchStatusOptions(),
     ]);
 
     // Group updates under their linked PO record id.
@@ -114,7 +147,7 @@ export async function GET() {
       return bTime.localeCompare(aTime);
     });
 
-    return NextResponse.json({ configured: true, pos });
+    return NextResponse.json({ configured: true, pos, statusOptions });
   } catch (err) {
     console.error(err);
     return NextResponse.json(
