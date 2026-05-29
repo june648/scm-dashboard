@@ -19,39 +19,41 @@ interface PoRecord {
   updates: PoUpdate[];
 }
 
-// Fallback list used only if the live Airtable schema read is unavailable.
-// The board normally reads these straight from Airtable.
-const STATUS_OPTIONS = [
-  "Sourcing",
-  "Sourcing Confirmed",
-  "Partially Ready",
-  "Partially Booked",
-  "Booked",
-  "Ready to Ship",
-  "In Transit",
-  "Delivered",
-  "Closed",
+interface StatusOption {
+  name: string;
+  color: string; // Airtable color token, e.g. "blueLight2"
+}
+
+// Fallback status order, used only if the live Airtable schema read is
+// unavailable. Normally the names AND colors come straight from Airtable.
+const STATUS_OPTIONS: StatusOption[] = [
+  { name: "Sourcing", color: "blueLight2" },
+  { name: "In Production", color: "purpleLight2" },
+  { name: "Partially Ready", color: "cyanLight2" },
+  { name: "Ready to Ship", color: "tealLight2" },
+  { name: "In Transit", color: "greenLight2" },
+  { name: "Delivered", color: "yellowLight2" },
+  { name: "Closed", color: "orangeLight2" },
 ];
 
-function statusStyle(status: string): { bg: string; color: string } {
-  switch (status) {
-    case "Ready to Ship":
-    case "Delivered":
-      return { bg: "var(--success-light)", color: "var(--success)" };
-    case "Partially Ready":
-      return { bg: "var(--warning-light)", color: "var(--warning)" };
-    case "Sourcing Confirmed": // teal in Airtable
-      return { bg: "#d3f0ec", color: "#0b7a6b" };
-    case "Partially Booked": // cyan in Airtable
-      return { bg: "#d6eff7", color: "#0e7490" };
-    case "Booked":
-    case "In Transit":
-      return { bg: "var(--blue-light)", color: "var(--blue)" };
-    case "Closed":
-      return { bg: "var(--gray-100)", color: "var(--gray-500)" };
-    default: // Sourcing / unknown
-      return { bg: "var(--purple-light)", color: "var(--purple)" };
-  }
+// Translate an Airtable single-select color token (e.g. "blueLight2") into a
+// soft badge background + readable text color, so badges match Airtable.
+function airtableColorStyle(token: string): { bg: string; color: string } {
+  const base = token.replace(/(Light|Bright|Dark)\d?$/i, "").toLowerCase();
+  const map: Record<string, { bg: string; color: string }> = {
+    blue: { bg: "#dbe8ff", color: "#2554b0" },
+    cyan: { bg: "#d6eff7", color: "#0e7490" },
+    teal: { bg: "#d3f0ec", color: "#0b7a6b" },
+    green: { bg: "#e2f5e9", color: "#1e874b" },
+    yellow: { bg: "#fdf3d3", color: "#9a7400" },
+    orange: { bg: "#ffe8d4", color: "#b5550f" },
+    red: { bg: "#ffe0e0", color: "#c0392b" },
+    pink: { bg: "#fde0ee", color: "#b03a76" },
+    purple: { bg: "#efe4f7", color: "#7d3c98" },
+    gray: { bg: "#eceef2", color: "#5b6270" },
+    grey: { bg: "#eceef2", color: "#5b6270" },
+  };
+  return map[base] || { bg: "var(--purple-light)", color: "var(--purple)" };
 }
 
 // Render a timestamp in Philippine / China time (UTC+8).
