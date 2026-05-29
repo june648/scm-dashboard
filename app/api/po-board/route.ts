@@ -250,3 +250,152 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
 }
+
+// Edit an existing PO or update record.
+export async function PATCH(req: Request) {
+  if (!isConfigured()) {
+    return NextResponse.json({ error: "Airtable is not configured yet." }, { status: 503 });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+
+  const type = body.type;
+  const id = String(body.id || "").trim();
+  if (!id) {
+    return NextResponse.json({ error: "Record id is required." }, { status: 400 });
+  }
+
+  try {
+    if (type === "po") {
+      const poNumber = String(body.poNumber || "").trim();
+      const description = String(body.description || "").trim();
+      const status = String(body.status || "").trim();
+      if (!poNumber) {
+        return NextResponse.json({ error: "PO Number is required." }, { status: 400 });
+      }
+      const fields: Record<string, unknown> = {
+        "PO Number": poNumber,
+        Description: description,
+      };
+      if (status) fields.Status = status;
+
+      const res = await fetch(tableUrl(POS_TABLE, `/${id}`), {
+        method: "PATCH",
+        headers: authHeaders(true),
+        body: JSON.stringify({ fields }),
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Edit PO failed (${res.status}): ${errBody}`);
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    if (type === "update") {
+      const itemName = String(body.itemName || "").trim();
+      const updatedBy = String(body.updatedBy || "").trim();
+      const availableIn = body.availableIn ? String(body.availableIn) : null;
+      const notes = String(body.notes || "").trim();
+
+      if (!itemName) {
+        return NextResponse.json({ error: "Item / ASIN is required." }, { status: 400 });
+      }
+      if (!updatedBy) {
+        return NextResponse.json({ error: "Your name (Updated By) is required." }, { status: 400 });
+      }
+
+      // Send empty values too, so clearing a field actually clears it.
+      const fields: Record<string, unknown> = {
+        "Item / ASIN": itemName,
+        "Updated By": updatedBy,
+        "Available In": availableIn,
+        Notes: notes,
+      };
+
+      const res = await fetch(tableUrl(UPDATES_TABLE, `/${id}`), {
+        method: "PATCH",
+        headers: authHeaders(true),
+        body: JSON.stringify({ fields }),
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Edit update failed (${res.status}): ${errBody}`);
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    return NextResponse.json({ error: "Unknown request type." }, { status: 400 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+  }
+}
+
+// Delete a PO (and its updates) or a single update.
+export async function DELETE(req: Request) {
+  if (!isConfigured()) {
+    return NextResponse.json({ error: "Airtable is not configured yet." }, { status: 503 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const type = searchParams.get("type");
+  const id = (searchParams.get("id") || "").trim();
+  if (!id) {
+    return NextResponse.json({ error: "Record id is required." }, { status: 400 });
+  }
+
+  try {
+    if (type === "update") {
+      const res = await fetch(tableUrl(UPDATES_TABLE, `/${id}`), {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Delete update failed (${res.status}): ${errBody}`);
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    if (type === "po") {
+      // Remove the PO's linked updates first, then the PO itself.
+      const updatesRaw = await fetchAll(UPDATES_TABLE);
+      const childIds = updatesRaw
+        .filter((rec) => {
+          const link = (rec.fields as Record<string, unknown>)["PO"] as string[] | undefined;
+          return Array.isArray(link) && link.includes(id);
+        })
+        .map((rec) => rec.id);
+
+      // Airtable deletes up to 10 records per batched request.
+      for (let i = 0; i < childIds.length; i += 10) {
+        const batch = childIds.slice(i, i + 10);
+        const qs = batch.map((rid) => `records[]=${encodeURIComponent(rid)}`).join("&");
+        await fetch(tableUrl(UPDATES_TABLE, `?${qs}`), {
+          method: "DELETE",
+          headers: authHeaders(),
+        });
+      }
+
+      const res = await fetch(tableUrl(POS_TABLE, `/${id}`), {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Delete PO failed (${res.status}): ${errBody}`);
+      }
+      return NextResponse.json({ ok: true, deletedUpdates: childIds.length });
+    }
+
+    return NextResponse.json({ error: "Unknown delete type." }, { status: 400 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+  }
+}

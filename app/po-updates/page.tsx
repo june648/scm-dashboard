@@ -267,6 +267,31 @@ function PoCard({
 }) {
   const opt = statusOptions.find((o) => o.name === po.status);
   const s = opt ? airtableColorStyle(opt.color) : airtableColorStyle("");
+  const [editingPo, setEditingPo] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDeletePo() {
+    if (
+      !confirm(
+        `Delete PO #${po.poNumber} and all ${po.updates.length} of its update(s)? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/po-board?type=po&id=${encodeURIComponent(po.id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delete failed.");
+      onSaved();
+    } catch (e) {
+      alert((e as Error).message);
+      setDeleting(false);
+    }
+  }
+
   return (
     <div
       className="rounded-[var(--radius-lg)] border bg-white"
@@ -274,36 +299,73 @@ function PoCard({
     >
       {/* PO header */}
       <div className="flex flex-wrap items-start justify-between gap-3 border-b px-5 py-4" style={{ borderColor: "var(--gray-200)" }}>
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-[15px] font-bold" style={{ color: "var(--foreground)" }}>
-              PO #{po.poNumber}
-            </h2>
-            {po.status && (
-              <span
-                className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
-                style={{ background: s.bg, color: s.color }}
+        {editingPo ? (
+          <EditPoForm
+            po={po}
+            options={statusOptions}
+            onClose={() => setEditingPo(false)}
+            onSaved={() => {
+              setEditingPo(false);
+              onSaved();
+            }}
+          />
+        ) : (
+          <>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-[15px] font-bold" style={{ color: "var(--foreground)" }}>
+                  PO #{po.poNumber}
+                </h2>
+                {po.status && (
+                  <span
+                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+                    style={{ background: s.bg, color: s.color }}
+                  >
+                    {po.status}
+                  </span>
+                )}
+              </div>
+              {po.description && (
+                <p className="mt-0.5 text-[13px]" style={{ color: "var(--gray-500)" }}>
+                  {po.description}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onToggleAdd}
+                className="inline-flex items-center gap-1.5 rounded-[var(--radius-md)] border px-2.5 py-1.5 text-[12px] font-medium transition-colors"
+                style={{ borderColor: "var(--gray-200)", color: "var(--primary)", background: "white" }}
               >
-                {po.status}
-              </span>
-            )}
-          </div>
-          {po.description && (
-            <p className="mt-0.5 text-[13px]" style={{ color: "var(--gray-500)" }}>
-              {po.description}
-            </p>
-          )}
-        </div>
-        <button
-          onClick={onToggleAdd}
-          className="inline-flex items-center gap-1.5 rounded-[var(--radius-md)] border px-2.5 py-1.5 text-[12px] font-medium transition-colors"
-          style={{ borderColor: "var(--gray-200)", color: "var(--primary)", background: "white" }}
-        >
-          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          {isAdding ? "Cancel" : "Add update"}
-        </button>
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                {isAdding ? "Cancel" : "Add update"}
+              </button>
+              <button
+                onClick={() => setEditingPo(true)}
+                title="Edit PO"
+                className="inline-flex items-center justify-center rounded-[var(--radius-md)] border p-1.5 transition-colors"
+                style={{ borderColor: "var(--gray-200)", color: "var(--gray-500)", background: "white" }}
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                </svg>
+              </button>
+              <button
+                onClick={handleDeletePo}
+                disabled={deleting}
+                title="Delete PO"
+                className="inline-flex items-center justify-center rounded-[var(--radius-md)] border p-1.5 transition-colors"
+                style={{ borderColor: "var(--gray-200)", color: "var(--danger)", background: "white", opacity: deleting ? 0.5 : 1 }}
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </svg>
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Updates */}
@@ -323,28 +385,13 @@ function PoCard({
                   <th className="py-1.5 pr-4 font-semibold">Available in</th>
                   <th className="py-1.5 pr-4 font-semibold">Notes</th>
                   <th className="py-1.5 pr-4 font-semibold">Updated by</th>
-                  <th className="py-1.5 font-semibold">Updated (PHT)</th>
+                  <th className="py-1.5 pr-4 font-semibold">Updated (PHT)</th>
+                  <th className="py-1.5 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {po.updates.map((u) => (
-                  <tr key={u.id} className="border-t" style={{ borderColor: "var(--gray-100)" }}>
-                    <td className="py-2 pr-4 font-medium" style={{ color: "var(--foreground)" }}>
-                      {u.itemName}
-                    </td>
-                    <td className="py-2 pr-4" style={{ color: "var(--foreground)" }}>
-                      {u.availableIn ? formatDate(u.availableIn) : "—"}
-                    </td>
-                    <td className="py-2 pr-4" style={{ color: "var(--gray-500)" }}>
-                      {u.notes || "—"}
-                    </td>
-                    <td className="py-2 pr-4" style={{ color: "var(--gray-500)" }}>
-                      {u.updatedBy || "—"}
-                    </td>
-                    <td className="py-2" style={{ color: "var(--gray-400)" }}>
-                      {formatPHT(u.createdAt)}
-                    </td>
-                  </tr>
+                  <UpdateRow key={u.id} update={u} onSaved={onSaved} />
                 ))}
               </tbody>
             </table>
@@ -352,6 +399,258 @@ function PoCard({
         )}
 
         {isAdding && <AddUpdateForm poId={po.id} onSaved={onSaved} />}
+      </div>
+    </div>
+  );
+}
+
+function UpdateRow({ update, onSaved }: { update: PoUpdate; onSaved: () => void }) {
+  const [editing, setEditing] = useState(false);
+  const [itemName, setItemName] = useState(update.itemName);
+  const [availableIn, setAvailableIn] = useState(update.availableIn || "");
+  const [updatedBy, setUpdatedBy] = useState(update.updatedBy);
+  const [notes, setNotes] = useState(update.notes);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function save() {
+    if (!itemName.trim() || !updatedBy.trim()) {
+      setErr("Item / ASIN and Updated by are required.");
+      return;
+    }
+    setSaving(true);
+    setErr(null);
+    try {
+      const res = await fetch("/api/po-board", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "update",
+          id: update.id,
+          itemName,
+          availableIn: availableIn || null,
+          updatedBy,
+          notes,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Save failed.");
+      setEditing(false);
+      onSaved();
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function remove() {
+    if (!confirm(`Delete the update for "${update.itemName}"? This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(
+        `/api/po-board?type=update&id=${encodeURIComponent(update.id)}`,
+        { method: "DELETE" }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delete failed.");
+      onSaved();
+    } catch (e) {
+      alert((e as Error).message);
+      setDeleting(false);
+    }
+  }
+
+  if (editing) {
+    return (
+      <tr className="border-t" style={{ borderColor: "var(--gray-100)" }}>
+        <td className="py-2 pr-3">
+          <input value={itemName} onChange={(e) => setItemName(e.target.value)} style={cellInputStyle} />
+        </td>
+        <td className="py-2 pr-3">
+          <input type="date" value={availableIn} onChange={(e) => setAvailableIn(e.target.value)} style={cellInputStyle} />
+        </td>
+        <td className="py-2 pr-3">
+          <input value={notes} onChange={(e) => setNotes(e.target.value)} style={cellInputStyle} />
+        </td>
+        <td className="py-2 pr-3">
+          <input value={updatedBy} onChange={(e) => setUpdatedBy(e.target.value)} style={cellInputStyle} />
+        </td>
+        <td className="py-2 pr-3" style={{ color: "var(--gray-400)" }}>
+          {formatPHT(update.createdAt)}
+          {err && (
+            <span className="block text-[11px]" style={{ color: "var(--danger)" }}>
+              {err}
+            </span>
+          )}
+        </td>
+        <td className="py-2">
+          <div className="flex items-center justify-end gap-1.5">
+            <button
+              onClick={save}
+              disabled={saving}
+              className="rounded-[var(--radius-sm)] px-2 py-1 text-[12px] font-semibold text-white"
+              style={{ background: "var(--primary)", opacity: saving ? 0.6 : 1 }}
+            >
+              {saving ? "…" : "Save"}
+            </button>
+            <button
+              onClick={() => {
+                setEditing(false);
+                setErr(null);
+                setItemName(update.itemName);
+                setAvailableIn(update.availableIn || "");
+                setUpdatedBy(update.updatedBy);
+                setNotes(update.notes);
+              }}
+              className="rounded-[var(--radius-sm)] border px-2 py-1 text-[12px]"
+              style={{ borderColor: "var(--gray-200)", color: "var(--gray-500)" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr className="border-t group" style={{ borderColor: "var(--gray-100)" }}>
+      <td className="py-2 pr-4 font-medium" style={{ color: "var(--foreground)" }}>
+        {update.itemName}
+      </td>
+      <td className="py-2 pr-4" style={{ color: "var(--foreground)" }}>
+        {update.availableIn ? formatDate(update.availableIn) : "—"}
+      </td>
+      <td className="py-2 pr-4" style={{ color: "var(--gray-500)" }}>
+        {update.notes || "—"}
+      </td>
+      <td className="py-2 pr-4" style={{ color: "var(--gray-500)" }}>
+        {update.updatedBy || "—"}
+      </td>
+      <td className="py-2 pr-4" style={{ color: "var(--gray-400)" }}>
+        {formatPHT(update.createdAt)}
+      </td>
+      <td className="py-2">
+        <div className="flex items-center justify-end gap-1.5">
+          <button
+            onClick={() => setEditing(true)}
+            title="Edit"
+            className="inline-flex items-center justify-center rounded-[var(--radius-sm)] p-1 transition-colors"
+            style={{ color: "var(--gray-400)" }}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+            </svg>
+          </button>
+          <button
+            onClick={remove}
+            disabled={deleting}
+            title="Delete"
+            className="inline-flex items-center justify-center rounded-[var(--radius-sm)] p-1 transition-colors"
+            style={{ color: "var(--danger)", opacity: deleting ? 0.5 : 1 }}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+const cellInputStyle: React.CSSProperties = {
+  width: "100%",
+  border: "1px solid var(--gray-200)",
+  borderRadius: "var(--radius-sm)",
+  padding: "4px 6px",
+  fontSize: "13px",
+  background: "white",
+  color: "var(--foreground)",
+};
+
+function EditPoForm({
+  po,
+  options,
+  onClose,
+  onSaved,
+}: {
+  po: PoRecord;
+  options: StatusOption[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [poNumber, setPoNumber] = useState(po.poNumber);
+  const [description, setDescription] = useState(po.description);
+  const [status, setStatus] = useState(po.status || options[0]?.name || "");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function submit() {
+    if (!poNumber.trim()) {
+      setErr("PO Number is required.");
+      return;
+    }
+    setSaving(true);
+    setErr(null);
+    try {
+      const res = await fetch("/api/po-board", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "po", id: po.id, poNumber, description, status }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Save failed.");
+      onSaved();
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="w-full">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Field label="PO Number *">
+          <input value={poNumber} onChange={(e) => setPoNumber(e.target.value)} style={inputStyle} />
+        </Field>
+        <Field label="Description">
+          <input value={description} onChange={(e) => setDescription(e.target.value)} style={inputStyle} />
+        </Field>
+        <Field label="Status">
+          <select value={status} onChange={(e) => setStatus(e.target.value)} style={inputStyle}>
+            {options.map((o) => (
+              <option key={o.name} value={o.name}>
+                {o.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </div>
+      {err && (
+        <p className="mt-2 text-[12px]" style={{ color: "var(--danger)" }}>
+          {err}
+        </p>
+      )}
+      <div className="mt-3 flex gap-2">
+        <button
+          onClick={submit}
+          disabled={saving}
+          className="rounded-[var(--radius-md)] px-3 py-1.5 text-[13px] font-semibold text-white"
+          style={{ background: "var(--primary)", opacity: saving ? 0.6 : 1 }}
+        >
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+        <button
+          onClick={onClose}
+          className="rounded-[var(--radius-md)] border px-3 py-1.5 text-[13px] font-medium"
+          style={{ borderColor: "var(--gray-200)", color: "var(--gray-500)" }}
+        >
+          Cancel
+        </button>
       </div>
     </div>
   );
