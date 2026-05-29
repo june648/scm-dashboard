@@ -48,6 +48,7 @@ async function fetchAll(table: string) {
 
 interface AirtableChoice {
   name: string;
+  color?: string;
 }
 interface AirtableField {
   name: string;
@@ -60,8 +61,9 @@ interface AirtableTable {
 }
 
 // Read the Status single-select options straight from Airtable's schema,
-// so statuses added/renamed in Airtable show up on the board automatically.
-async function fetchStatusOptions(): Promise<string[]> {
+// so statuses (and their colors) added/renamed in Airtable show up on the
+// board automatically. Each choice carries Airtable's own color token.
+async function fetchStatusOptions(): Promise<{ name: string; color: string }[]> {
   try {
     const res = await fetch(`${AIRTABLE_API}/meta/bases/${BASE_ID}/tables`, {
       headers: authHeaders(),
@@ -72,7 +74,10 @@ async function fetchStatusOptions(): Promise<string[]> {
     const tables: AirtableTable[] = data.tables || [];
     const table = tables.find((t) => t.name === POS_TABLE || t.id === POS_TABLE);
     const field = table?.fields?.find((f) => f.name === "Status");
-    return (field?.options?.choices || []).map((c) => c.name);
+    return (field?.options?.choices || []).map((c) => ({
+      name: c.name,
+      color: c.color || "",
+    }));
   } catch {
     return [];
   }

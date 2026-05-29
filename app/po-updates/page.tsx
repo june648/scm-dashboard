@@ -87,7 +87,7 @@ function formatDate(iso: string): string {
 
 export default function PoUpdatesPage() {
   const [pos, setPos] = useState<PoRecord[]>([]);
-  const [statusOptions, setStatusOptions] = useState<string[]>(STATUS_OPTIONS);
+  const [statusOptions, setStatusOptions] = useState<StatusOption[]>(STATUS_OPTIONS);
   const [configured, setConfigured] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -227,6 +227,7 @@ export default function PoUpdatesPage() {
               <PoCard
                 key={po.id}
                 po={po}
+                statusOptions={statusOptions}
                 isAdding={addUpdateFor === po.id}
                 onToggleAdd={() => setAddUpdateFor((cur) => (cur === po.id ? null : po.id))}
                 onSaved={() => {
@@ -251,16 +252,19 @@ export default function PoUpdatesPage() {
 
 function PoCard({
   po,
+  statusOptions,
   isAdding,
   onToggleAdd,
   onSaved,
 }: {
   po: PoRecord;
+  statusOptions: StatusOption[];
   isAdding: boolean;
   onToggleAdd: () => void;
   onSaved: () => void;
 }) {
-  const s = statusStyle(po.status);
+  const opt = statusOptions.find((o) => o.name === po.status);
+  const s = opt ? airtableColorStyle(opt.color) : airtableColorStyle("");
   return (
     <div
       className="rounded-[var(--radius-lg)] border bg-white"
@@ -453,13 +457,13 @@ function NewPoForm({
   onClose,
   onSaved,
 }: {
-  options: string[];
+  options: StatusOption[];
   onClose: () => void;
   onSaved: () => void;
 }) {
   const [poNumber, setPoNumber] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState(options[0] || STATUS_OPTIONS[0]);
+  const [status, setStatus] = useState(options[0]?.name || STATUS_OPTIONS[0].name);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -514,8 +518,8 @@ function NewPoForm({
         <Field label="Status">
           <select value={status} onChange={(e) => setStatus(e.target.value)} style={inputStyle}>
             {options.map((o) => (
-              <option key={o} value={o}>
-                {o}
+              <option key={o.name} value={o.name}>
+                {o.name}
               </option>
             ))}
           </select>
