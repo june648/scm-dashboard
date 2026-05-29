@@ -19,9 +19,14 @@ interface PoRecord {
   updates: PoUpdate[];
 }
 
+// Fallback list used only if the live Airtable schema read is unavailable.
+// The board normally reads these straight from Airtable.
 const STATUS_OPTIONS = [
   "Sourcing",
+  "Sourcing Confirmed",
   "Partially Ready",
+  "Partially Booked",
+  "Booked",
   "Ready to Ship",
   "In Transit",
   "Delivered",
@@ -35,6 +40,11 @@ function statusStyle(status: string): { bg: string; color: string } {
       return { bg: "var(--success-light)", color: "var(--success)" };
     case "Partially Ready":
       return { bg: "var(--warning-light)", color: "var(--warning)" };
+    case "Sourcing Confirmed": // teal in Airtable
+      return { bg: "#d3f0ec", color: "#0b7a6b" };
+    case "Partially Booked": // cyan in Airtable
+      return { bg: "#d6eff7", color: "#0e7490" };
+    case "Booked":
     case "In Transit":
       return { bg: "var(--blue-light)", color: "var(--blue)" };
     case "Closed":
