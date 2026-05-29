@@ -1,0 +1,214 @@
+import { NextResponse } from "next/server";
+
+// Always run fresh so new updates show immediately.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const API_KEY = process.env.AIRTABLE_API_KEY;
+const BASE_ID = process.env.AIRTABLE_BASE_ID;
+const POS_TABLE = process.env.AIRTABLE_POS_TABLE || "Purchase Orders";
+const UPDATES_TABLE = process.env.AIRTABLE_UPDATES_TABLE || "PO Updates";
+
+const AIRTABLE_API = "https://api.airtable.com/v0";
+
+function isConfigured() {
+  return Boolean(API_KEY && BASE_ID);
+}
+
+function tableUrl(table: string, query = "") {
+  return `${AIRTABLE_API}/${BASE_ID}/${encodeURIComponent(table)}${query}`;
+}
+
+function authHeaders(json = false): HeadersInit {
+  const h: Record<string, string> = { Authorization: `Bearer ${API_KEY}` };
+  if (json) h["Content-Type"] = "application/json";
+  return h;
+}
+
+// Pull every record from a table, following Airtable pagination.
+async function fetchAll(table: string) {
+  const records: { id: string; fields: Record<string, unknown>; createdTime: string }[] = [];
+  let offset: string | undefined;
+  do {
+    const query = offset ? `?offset=${encodeURIComponent(offset)}` : "";
+    const res = await fetch(tableUrl(table, query), {
+      headers: authHeaders(),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Airtable ${table} read failed (${res.status}): ${body}`);
+    }
+    const data = await res.json();
+    records.push(...(data.records || []));
+    offset = data.offset;
+  } while (offset);
+  return records;
+}
+
+export interface PoUpdate {
+  id: string;
+  itemName: string;
+  availableIn: string | null;
+  notes: string;
+  updatedBy: string;
+  createdAt: string;
+}
+
+export interface PoRecord {
+  id: string;
+  poNumber: string;
+  description: string;
+  status: string;
+  updates: PoUpdate[];
+}
+
+export async function GET() {
+  if (!isConfigured()) {
+    return NextResponse.json({ configured: false, pos: [] });
+  }
+
+  try {
+    const [posRaw, updatesRaw] = await Promise.all([
+      fetchAll(POS_TABLE),
+      fetchAll(UPDATES_TABLE),
+    ]);
+
+    // Group updates under their linked PO record id.
+    const updatesByPo = new Map<string, PoUpdate[]>();
+    for (const rec of updatesRaw) {
+      const f = rec.fields as Record<string, unknown>;
+      const link = f["PO"] as string[] | undefined;
+      const poId = Array.isArray(link) && link.length > 0 ? link[0] : "__unlinked__";
+      const update: PoUpdate = {
+        id: rec.id,
+        itemName: (f["Item / ASIN"] as string) || (f["Name"] as string) || "",
+        availableIn: (f["Available In"] as string) || null,
+        notes: (f["Notes"] as string) || "",
+        updatedBy: (f["Updated By"] as string) || "",
+        createdAt: rec.createdTime,
+      };
+      const list = updatesByPo.get(poId) || [];
+      list.push(update);
+      updatesByPo.set(poId, list);
+    }
+
+    const pos: PoRecord[] = posRaw.map((rec) => {
+      const f = rec.fields as Record<string, unknown>;
+      const updates = (updatesByPo.get(rec.id) || []).sort((a, b) =>
+        b.createdAt.localeCompare(a.createdAt)
+      );
+      return {
+        id: rec.id,
+        poNumber: (f["PO Number"] as string) || "",
+        description: (f["Description"] as string) || "",
+        status: (f["Status"] as string) || "",
+        updates,
+      };
+    });
+
+    // Newest POs first (by most recent activity).
+    pos.sort((a, b) => {
+      const aTime = a.updates[0]?.createdAt || "";
+      const bTime = b.updates[0]?.createdAt || "";
+      return bTime.localeCompare(aTime);
+    });
+
+    return NextResponse.json({ configured: true, pos });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { configured: true, error: (err as Error).message, pos: [] },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  if (!isConfigured()) {
+    return NextResponse.json(
+      { error: "Airtable is not configured yet." },
+      { status: 503 }
+    );
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+
+  const type = body.type;
+
+  try {
+    if (type === "po") {
+      const poNumber = String(body.poNumber || "").trim();
+      const description = String(body.description || "").trim();
+      const status = String(body.status || "Sourcing").trim();
+      if (!poNumber) {
+        return NextResponse.json({ error: "PO Number is required." }, { status: 400 });
+      }
+      const res = await fetch(tableUrl(POS_TABLE), {
+        method: "POST",
+        headers: authHeaders(true),
+        body: JSON.stringify({
+          fields: {
+            "PO Number": poNumber,
+            Description: description,
+            Status: status,
+          },
+        }),
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Create PO failed (${res.status}): ${errBody}`);
+      }
+      const data = await res.json();
+      return NextResponse.json({ ok: true, id: data.id });
+    }
+
+    if (type === "update") {
+      const poId = String(body.poId || "").trim();
+      const itemName = String(body.itemName || "").trim();
+      const updatedBy = String(body.updatedBy || "").trim();
+      const availableIn = body.availableIn ? String(body.availableIn) : null;
+      const notes = String(body.notes || "").trim();
+
+      if (!poId) {
+        return NextResponse.json({ error: "PO is required." }, { status: 400 });
+      }
+      if (!itemName) {
+        return NextResponse.json({ error: "Item / ASIN is required." }, { status: 400 });
+      }
+      if (!updatedBy) {
+        return NextResponse.json({ error: "Your name (Updated By) is required." }, { status: 400 });
+      }
+
+      const fields: Record<string, unknown> = {
+        "Item / ASIN": itemName,
+        "Updated By": updatedBy,
+        PO: [poId],
+      };
+      if (availableIn) fields["Available In"] = availableIn;
+      if (notes) fields["Notes"] = notes;
+
+      const res = await fetch(tableUrl(UPDATES_TABLE), {
+        method: "POST",
+        headers: authHeaders(true),
+        body: JSON.stringify({ fields }),
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Create update failed (${res.status}): ${errBody}`);
+      }
+      const data = await res.json();
+      return NextResponse.json({ ok: true, id: data.id });
+    }
+
+    return NextResponse.json({ error: "Unknown request type." }, { status: 400 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+  }
+}
